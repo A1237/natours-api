@@ -11,10 +11,11 @@ const Tour = require('../models/tourModel');
 
 exports.getallTours = async (req, res) => {
   try {
+    console.log(req)
     console.log(req.query);
 
-    const fields = req.query.fields.split(',').join(' ');
-    console.log(fields);
+    // const fields = req.query.fields.split(',').join(' ');
+    // console.log(fields);
     // * Here on logging page it gives 2
 
     // 1A) Simple Filtering
@@ -34,20 +35,26 @@ exports.getallTours = async (req, res) => {
     let query = Tour.find(JSON.parse(queryStr));
 
     // 2) SORTING
-    const sortBy = req.query.sort.split(',').join(' ');
-
-    // console.log(sortBy);
     if (req.query.sort) {
-      query = query.sort(sortBy);
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy)
     } else {
       query = query.sort('-createdAt');
     }
 
-    console.log(req.query);
-    //* 3) not completed FIELD LIMITING
-    if (req.quer.fields) {
-      query = query.select(fields);
+    // * field limiting 
+    if (req.query.fields) {
+      const sortBy = req.query.fields.split(',').join(' ');
+      console.log(sortBy)
+      query = query.select(sortBy);
     }
+
+
+    console.log(req.query, 'asmk');
+    //* 3) not completed FIELD LIMITING
+    // if (req.query.fields) {
+    //   query = query.select(fields);
+    // }
     //* not completed FIELD LIMITING
 
     // EXECUTE QUERY
