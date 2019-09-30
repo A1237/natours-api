@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
-const tourModel = new mongoose.Schema({
+const tourSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'A tour must have a name'],
         unique: true,
         trim: true
     },
+    slug: String,
     duration: {
         type: String,
         required: [true, 'A tour must have a duration']
@@ -51,9 +53,40 @@ const tourModel = new mongoose.Schema({
         default: Date.now(),
         select: false
     },
-    startDates: [Date]
+    startDates: [Date],
+    secretTour: {
+        type: Boolean,
+        default: false
+    }
+
 });
 
-const Tour = new mongoose.model('Tour', tourModel);
+// tourSchema.virtual('durationWeeks').get(function () {
+//     return this.duration / 7;
+// })
+
+//DOCUMENT MIDDLEARE : runs before .save() or .create()
+tourSchema.pre('save', function (next) {
+    this.slug = slugify(this.name);
+    next();
+})
+
+// tourSchema.post('save', function (doc, next) {
+//     console.log(doc);
+//     next();
+// })
+
+// QUERY MIDDLEWARE
+tourSchema.pre('find', function (next) {
+    this.find({
+        secretTour: {
+            $ne: true
+        }
+    })
+    next();
+})
+
+
+const Tour = new mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
